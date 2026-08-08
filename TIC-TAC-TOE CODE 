@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Tic Tac Toe</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root{
+    --bg: #14141f;
+    --panel: #1c1c2b;
+    --line: #33334a;
+    --cream: #f2efe6;
+    --x-color: #ff7a5c;
+    --o-color: #4fd4c4;
+    --muted: #7d7d99;
+  }
+
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(255,122,92,0.08), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(79,212,196,0.08), transparent 40%);
+    color: var(--cream);
+    font-family: 'JetBrains Mono', monospace;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px 16px;
+  }
+
+  .app{
+    width: 100%;
+    max-width: 380px;
+  }
+
+  h1{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.7rem;
+    letter-spacing: -0.02em;
+    text-align:center;
+    margin: 0 0 4px;
+  }
+  h1 span:first-child{ color: var(--x-color); }
+  h1 span:last-child{ color: var(--o-color); }
+
+  .subtitle{
+    text-align:center;
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+
+  .scoreboard{
+    display:flex;
+    justify-content:space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .score{
+    flex:1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align:center;
+  }
+  .score .label{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .score.x-score .label{ color: var(--x-color); }
+  .score.o-score .label{ color: var(--o-color); }
+  .score.draw-score .label{ color: var(--muted); }
+  .score .count{
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .score .tag{
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .status{
+    text-align:center;
+    min-height: 24px;
+    margin-bottom: 14px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
+  .status.active{ color: var(--cream); }
+
+  .board-wrap{
+    position: relative;
+  }
+
+  .board{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: var(--line);
+    padding: 8px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
+  }
+
+  .cell{
+    aspect-ratio: 1;
+    background: var(--panel);
+    border: none;
+    border-radius: 10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    cursor:pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    color: transparent;
+  }
+  .cell:active{ transform: scale(0.96); }
+  .cell:not(.filled):not(.locked):hover{ background: #24243a; }
+
+  .cell.mark-x{ color: var(--x-color); }
+  .cell.mark-o{ color: var(--o-color); }
+  .cell.pop{ animation: pop 0.22s ease; }
+  @keyframes pop{
+    0%{ transform: scale(0.4); opacity: 0; }
+    100%{ transform: scale(1); opacity: 1; }
+  }
+
+  .cell.win{
+    background: #26263c;
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+
+  .controls{
+    display:flex;
+    justify-content:center;
+    margin-top: 20px;
+  }
+
+  button.reset{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid var(--line);
+    padding: 10px 22px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  button.reset:hover{
+    border-color: var(--muted);
+    background: var(--panel);
+  }
+  button.reset:focus-visible, .cell:focus-visible{
+    outline: 2px solid var(--o-color);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .cell.pop{ animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <h1><span>X</span> / <span>O</span></h1>
+  <div class="subtitle">Tic Tac Toe</div>
+
+  <div class="scoreboard">
+    <div class="score x-score">
+      <div class="label">X</div>
+      <div class="count" id="scoreX">0</div>
+      <div class="tag">wins</div>
+    </div>
+    <div class="score draw-score">
+      <div class="label">—</div>
+      <div class="count" id="scoreDraw">0</div>
+      <div class="tag">draws</div>
+    </div>
+    <div class="score o-score">
+      <div class="label">O</div>
+      <div class="count" id="scoreO">0</div>
+      <div class="tag">wins</div>
+    </div>
+  </div>
+
+  <div class="status active" id="status">X's turn</div>
+
+  <div class="board-wrap">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="controls">
+    <button class="reset" id="resetBtn">New round</button>
+  </div>
+</div>
+
+<script>
+  const boardEl = document.getElementById('board');
+  const statusEl = document.getElementById('status');
+  const resetBtn = document.getElementById('resetBtn');
+  const scoreXEl = document.getElementById('scoreX');
+  const scoreOEl = document.getElementById('scoreO');
+  const scoreDrawEl = document.getElementById('scoreDraw');
+
+  const WIN_LINES = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  let cells = Array(9).fill(null);
+  let current = 'X';
+  let gameOver = false;
+  let scores = { X: 0, O: 0, draw: 0 };
+
+  function buildBoard(){
+    boardEl.innerHTML = '';
+    cells.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'cell';
+      btn.setAttribute('data-index', i);
+      btn.setAttribute('aria-label', 'Cell ' + (i + 1));
+      btn.addEventListener('click', () => handleMove(i));
+      boardEl.appendChild(btn);
+    });
+  }
+
+  function handleMove(i){
+    if (gameOver || cells[i]) return;
+
+    cells[i] = current;
+    const cellEl = boardEl.children[i];
+    cellEl.textContent = current;
+    cellEl.classList.add('filled', 'mark-' + current.toLowerCase(), 'pop');
+
+    const winLine = checkWin();
+    if (winLine){
+      gameOver = true;
+      winLine.forEach(idx => boardEl.children[idx].classList.add('win'));
+      scores[current]++;
+      updateScores();
+      statusEl.textContent = current + ' wins!';
+      statusEl.classList.remove('active');
+      return;
+    }
+
+    if (cells.every(c => c)){
+      gameOver = true;
+      scores.draw++;
+      updateScores();
+      statusEl.textContent = "It's a draw";
+      statusEl.classList.remove('active');
+      return;
+    }
+
+    current = current === 'X' ? 'O' : 'X';
+    statusEl.textContent = current + "'s turn";
+    statusEl.classList.add('active');
+  }
+
+  function checkWin(){
+    for (const line of WIN_LINES){
+      const [a,b,c] = line;
+      if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return line;
+    }
+    return null;
+  }
+
+  function updateScores(){
+    scoreXEl.textContent = scores.X;
+    scoreOEl.textContent = scores.O;
+    scoreDrawEl.textContent = scores.draw;
+  }
+
+  function newRound(){
+    cells = Array(9).fill(null);
+    current = 'X';
+    gameOver = false;
+    statusEl.textContent = "X's turn";
+    statusEl.classList.add('active');
+    buildBoard();
+  }
+
+  resetBtn.addEventListener('click', newRound);
+
+  newRound();
+</script>
+
+</body>
+</html>
