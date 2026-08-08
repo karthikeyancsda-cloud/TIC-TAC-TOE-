@@ -10,3 +10,6 @@ This is a  Tic Tac Toe  game web site created while learning front-end web devel
 - Mobile-friendly layout
 - Shopping page UI
 - Practice project for learning web development
+
+## Live demo
+- https://xo-website.netlify.app
