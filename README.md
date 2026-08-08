@@ -3,10 +3,10 @@ This is a  Tic Tac Toe  game web site created while learning front-end web devel
 
 
 ## Technologies Used
--HTML
--CSS
+- HTML
+- CSS
 
 ## Features
--Mobile-friendly layout
--Shopping page UI
--Practice project for learning web development
+- Mobile-friendly layout
+- Shopping page UI
+- Practice project for learning web development
